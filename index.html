@@ -78,6 +78,7 @@
     function startCall() {
       const listenEl = document.getElementById('listening');
       listenEl.innerText = 'ringing...';
+      listenEl.style.color = '#00FF00'; 
       listenEl.style.display = 'block';
       const callBtn = document.getElementById('call-btn');
       callBtn.disabled = true;
@@ -96,6 +97,8 @@
       ringingTone.play();
       setTimeout(() => updateMessage('intro'), 2000);
     }
+
+    
 
     function initRecognizer() {
       recognizer = new SpeechRecognition();

@@ -18,7 +18,7 @@
       background-color: rgba(0,0,0,0.8);
       padding: 2px 5px;
       border-radius: 3px;
-      animation: blink 1s infinite;
+      animation: blink 2s infinite;
     }
     @keyframes blink {
       0%, 100% { opacity: 1; }
@@ -26,7 +26,8 @@
     }
     h1 { margin-bottom: 20px; }
     button { margin: 5px; padding: 10px; font-size: 1em; background-color: #000; color: #00FF00; border: 1px solid #00FF00; border-radius: 5px; cursor: pointer; }
-    button:hover { background-color: #00FF00; color: #000; }
+    button.disabled { background-color: #555; color: #333; border-color: #555; cursor: not-allowed; }
+    button:hover:not(.disabled) { background-color: #00FF00; color: #000; }
     #message { margin: 20px 0; font-size: 1.2em; min-height: 40px; text-align: center; }
     #keypad { display: flex; flex-direction: column; align-items: center; }
     #display { border: 1px solid #00FF00; padding: 10px; width: 100%; text-align: center; margin-bottom: 10px; }
@@ -38,7 +39,7 @@
 <body>
   <div id="phone-screen">
     <h1>📞 Hacker Phone</h1>
-    <button onclick="startCall()">Call</button>
+    <button id="call-btn" onclick="startCall()">Call</button>
     <button id="mute-btn" onclick="toggleMute()">🔊</button>
     <div id="listening">🎙️ Listening...</div>
     <div id="message"></div>
@@ -65,60 +66,66 @@
   </div>
   <script>
     const answers = { q1:'49382', q2:'Checking Votes', q3:'@freedoniavoting.com', q4:'whiskers', q5:'October', q6:'2746', q7:'Margot Warner', q8:'VOTES4EVA', q9:'Sydney' };
-    let currentInput = '', audio, pickupTone, optionTone, correctTone, errorTone, ringingTone, recognizer, noResponseTimer;
+    let currentInput = '';
+    let audio, pickupTone, optionTone, correctTone, errorTone, ringingTone, recognizer, noResponseTimer;
     const keypadTones = {};
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     function startCall() {
+      // Show ringing status
       const listenEl = document.getElementById('listening');
-      // show ringing status
       listenEl.innerText = 'ringing...';
       listenEl.style.display = 'block';
+      // Disable call button
+      const callBtn = document.getElementById('call-btn');
+      callBtn.disabled = true;
+      callBtn.classList.add('disabled');
+
       ringingTone = document.getElementById('ringingTone');
       audio = document.getElementById('audio');
       pickupTone = document.getElementById('pickupTone');
       optionTone = document.getElementById('optionTone');
       correctTone = document.getElementById('correctTone');
       errorTone = document.getElementById('errorTone');
-      [1,2,3,4,5,6,7,8,9,0].forEach(n => {
-        keypadTones[n] = document.getElementById(`key${n}Tone`);
-      });
+      [1,2,3,4,5,6,7,8,9,0].forEach(n => keypadTones[n] = document.getElementById(`key${n}Tone`));
       if (SpeechRecognition) initRecognizer();
-      // play ringing sound
+      // Play ringing sound then show intro
       ringingTone.currentTime = 0;
       ringingTone.play();
-      // delay before intro prompt
       setTimeout(() => updateMessage('intro'), 2000);
     }
 
     function initRecognizer() {
       recognizer = new SpeechRecognition();
-      recognizer.lang = 'en-US'; recognizer.interimResults = false; recognizer.maxAlternatives = 1;
-      recognizer.onstart = () => { document.getElementById('listening').style.display = 'block'; };
+      recognizer.lang = 'en-US';
+      recognizer.interimResults = false;
+      recognizer.maxAlternatives = 1;
+      recognizer.onstart = () => {
+        // switch to listening indicator
+        const listenEl = document.getElementById('listening');
+        listenEl.innerText = '🎙️ Listening...';
+        listenEl.style.display = 'block';
+      };
       recognizer.onend = () => { document.getElementById('listening').style.display = 'none'; };
       recognizer.onresult = e => {
         clearTimeout(noResponseTimer);
-        const text = e.results[0][0].transcript.trim().toLowerCase();
-        handleSpoken(text);
+        handleSpoken(e.results[0][0].transcript.trim().toLowerCase());
       };
       recognizer.onerror = () => { clearTimeout(noResponseTimer); handleNoResponse(); };
     }
 
     function toggleMute() {
       [ringingTone, audio, pickupTone, optionTone, correctTone, errorTone, ...Object.values(keypadTones)].forEach(a => a.muted = !a.muted);
-      document.getElementById('mute-btn').innerText = ringingTone.muted ? '🔇' : '🔊';
+      document.getElementById('mute-btn').innerText = audio.muted ? '🔇' : '🔊';
     }
 
-    function playAudio() {
-      audio.currentTime = 0; audio.play();
-    }
+    function playAudio() { audio.currentTime = 0; audio.play(); }
 
     function handleSpoken(text) {
-      let resp;
+      let resp = '';
       if (text.includes('hello')) resp = "Hey there!";
       else if (text.includes('good')) resp = "That's great to hear! I'm doing good too.";
       else if (text.includes('bad') || text.includes('what')) resp = "Oh.. err.. I sure, I guess. Anyways.";
-      else resp = "";
       document.getElementById('message').innerText = resp;
       setTimeout(() => updateMessage('q1'), 1500);
     }
@@ -130,13 +137,17 @@
 
     function updateMessage(step) {
       if (step === 'intro') {
-        // hide ringing status before showing intro and start mic
-        const listenEl = document.getElementById('listening');
-        listenEl.style.display = 'none';
+        // hide ringing indicator, enable call
+        document.getElementById('listening').style.display = 'none';
+        const callBtn = document.getElementById('call-btn');
+        callBtn.disabled = false;
+        callBtn.classList.remove('disabled');
+        // play pickup tone shortly after
         setTimeout(() => { pickupTone.currentTime = 0; pickupTone.play(); }, 500);
       }
       playAudio();
-      let message = '', optionsHTML = '';
+      let message = '';
+      let optionsHTML = '';
       if (step === 'intro') {
         message = "Hi! This is IT support. How are you?";
         if (recognizer) {

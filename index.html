@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hacker Phone Call 📞</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #00FF00;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    #phone-screen {
+      border: 2px solid #00FF00;
+      padding: 20px;
+      width: 300px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #00FF00;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    button {
+      margin: 5px;
+      padding: 10px;
+      font-size: 1em;
+      background-color: #000;
+      color: #00FF00;
+      border: 1px solid #00FF00;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #00FF00;
+      color: #000;
+    }
+    #message {
+      margin: 20px 0;
+      font-size: 1.2em;
+      min-height: 40px;
+      text-align: center;
+    }
+    /* Keypad styles */
+    #keypad { display: flex; flex-direction: column; align-items: center; }
+    #display { border: 1px solid #00FF00; padding: 10px; width: 100%; text-align: center; margin-bottom: 10px; }
+    .keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+    .keys button { width: 60px; }
+  </style>
+</head>
+<body>
+  <div id="phone-screen">
+    <h1>📞 Hacker Phone</h1>
+    <button onclick="updateMessage('q1')">Call</button>
+    <div id="message"></div>
+    <div id="options"></div>
+  </div>
+  <script>
+    let currentInput = '';
+    function pressKey(digit) {
+      currentInput += digit;
+      document.getElementById('display').innerText = currentInput;
+    }
+    function clearKeypad() {
+      currentInput = '';
+      document.getElementById('display').innerText = '';
+    }
+    function submitKeypad(nextStep) {
+      const input = currentInput;
+      currentInput = '';
+      updateMessage(nextStep, input);
+    }
+    function updateMessage(step, input) {
+      let message = '';
+      let optionsHTML = '';
+      switch (step) {
+        case 'q1':
+          message = "What’s your employee ID?";
+          optionsHTML = `
+            <div id="keypad">
+              <div id="display"></div>
+              <div class="keys">
+                <button onclick="pressKey('1')">1</button>
+                <button onclick="pressKey('2')">2</button>
+                <button onclick="pressKey('3')">3</button>
+                <button onclick="pressKey('4')">4</button>
+                <button onclick="pressKey('5')">5</button>
+                <button onclick="pressKey('6')">6</button>
+                <button onclick="pressKey('7')">7</button>
+                <button onclick="pressKey('8')">8</button>
+                <button onclick="pressKey('9')">9</button>
+                <button onclick="pressKey('0')">0</button>
+                <button onclick="clearKeypad()">Clear</button>
+                <button onclick="submitKeypad('q2')">Submit</button>
+              </div>
+            </div>
+          `;
+          break;
+        case 'q2':
+          message = "Which department are you in?";
+          optionsHTML = `
+            <button onclick="updateMessage('q3', 'Finance')">Finance</button>
+            <button onclick="updateMessage('q3', 'Checking Votes')">Checking Votes</button>
+            <button onclick="updateMessage('q3', 'IT')">IT</button>
+            <button onclick="updateMessage('q3', 'Marketing/Advertisements')">Marketing/Advertisements</button>
+          `;
+          break;
+        case 'q3':
+          message = "Which email needs resetting?";
+          optionsHTML = `
+            <button onclick="updateMessage('q4', '@freedonia.com')">@freedonia.com</button>
+            <button onclick="updateMessage('q4', '@freedoniavoting.com')">@freedoniavoting.com</button>
+            <button onclick="updateMessage('q4', '@gmail.com')">@gmail.com</button>
+            <button onclick="updateMessage('q4', '@freedonia.au')">@freedonia.au</button>
+          `;
+          break;
+        case 'q4':
+          message = "Spell the name of your first pet.";
+          optionsHTML = `
+            <input type="text" id="input" placeholder="Type answer" style="background:#000;color:#00FF00;border:1px solid #00FF00;padding:5px;border-radius:3px;"/>
+            <button onclick="updateMessage('q5', document.getElementById('input').value)">Submit</button>
+          `;
+          break;
+        case 'q5':
+          message = "What was your birth month?";
+          optionsHTML = `
+            <button onclick="updateMessage('q6', 'March')">March</button>
+            <button onclick="updateMessage('q6', 'July')">July</button>
+            <button onclick="updateMessage('q6', 'January')">January</button>
+            <button onclick="updateMessage('q6', 'October')">October</button>
+          `;
+          break;
+        case 'q6':
+          message = "What’s the last four digits of your phone number?";
+          optionsHTML = `
+            <div id="keypad">
+              <div id="display"></div>
+              <div class="keys">
+                <button onclick="pressKey('1')">1</button>
+                <button onclick="pressKey('2')">2</button>
+                <button onclick="pressKey('3')">3</button>
+                <button onclick="pressKey('4')">4</button>
+                <button onclick="pressKey('5')">5</button>
+                <button onclick="pressKey('6')">6</button>
+                <button onclick="pressKey('7')">7</button>
+                <button onclick="pressKey('8')">8</button>
+                <button onclick="pressKey('9')">9</button>
+                <button onclick="pressKey('0')">0</button>
+                <button onclick="clearKeypad()">Clear</button>
+                <button onclick="submitKeypad('q7')">Submit</button>
+              </div>
+            </div>
+          `;
+          break;
+        case 'q7':
+          message = "Who’s your direct manager?";
+          optionsHTML = `
+            <button onclick="updateMessage('q8', 'Lee Chen')">Lee Chen</button>
+            <button onclick="updateMessage('q8', 'Maya Singh')">Maya Singh</button>
+            <button onclick="updateMessage('q8', 'Felix Grant')">Felix Grant</button>
+            <button onclick="updateMessage('q8', 'Margot Warner')">Margot Warner</button>
+          `;
+          break;
+        case 'q8':
+          message = "Enter the code word we agreed on at orientation.";
+          optionsHTML = `
+            <input type="text" id="input3" placeholder="Type answer" style="background:#000;color:#00FF00;border:1px solid #00FF00;padding:5px;border-radius:3px;"/>
+            <button onclick="updateMessage('q9', document.getElementById('input3').value)">Submit</button>
+          `;
+          break;
+        case 'q9':
+          message = "What city were you hired from?";
+          optionsHTML = `
+            <button onclick="updateMessage('flag', 'Sydney')">Sydney</button>
+            <button onclick="updateMessage('flag', 'Melbourne')">Melbourne</button>
+            <button onclick="updateMessage('flag', 'Brisbane')">Brisbane</button>
+            <button onclick="updateMessage('flag', 'Perth')">Perth</button>
+          `;
+          break;
+        case 'flag':
+          message = "✅ Correct! Here is your flag: FLAG-CTF-12345";
+          optionsHTML = `<button onclick="updateMessage('done')">Hang up</button>`;
+          break;
+        case 'done':
+          message = "Goodbye!";
+          optionsHTML = '';
+          break;
+      }
+      document.getElementById('message').innerHTML = message;
+      document.getElementById('options').innerHTML = optionsHTML;
+    }
+  </script>
+</body>
+</html>

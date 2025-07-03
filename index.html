@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Hacker Phone Call 📞</title>
+  <title>📞 Calling IT...</title>
   <style>
     body { background-color: #000; color: #00FF00; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
     #phone-screen { position: relative; border: 2px solid #00FF00; padding: 20px; width: 300px; border-radius: 10px; box-shadow: 0 0 10px #00FF00; }
@@ -36,6 +36,11 @@
     input { background:#000;color:#00FF00;border:1px solid #00FF00;padding:5px;border-radius:3px; margin:5px; }
   </style>
 </head>
+
+⩇⩇:⩇⩇
+<br><br><br>
+
+
 <body>
   <div id="phone-screen">
     <h1>📞 Hacker Phone</h1>
@@ -65,7 +70,7 @@
     <audio id="key0Tone" src="images/dial2.mp3" preload="auto"></audio>
   </div>
   <script>
-    const answers = { q1:'49382', q2:'Checking Votes', q3:'@freedoniavoting.com', q4:'whiskers', q5:'October', q6:'2746', q7:'Margot Warner', q8:'VOTES4EVA', q9:'Sydney' };
+    const answers = { q1:'43387', q2:'Checking Votes', q3:'@freedoniavoting.com', q4:'whiskers', q5:'October', q6:'2746', q7:'Margot Warner', q8:'VOTES4EVA', q9:'Sydney' };
     let currentInput = '';
     let audio, pickupTone, optionTone, correctTone, errorTone, ringingTone, recognizer, noResponseTimer;
     const keypadTones = {};
@@ -103,7 +108,7 @@
       recognizer.onstart = () => {
         // switch to listening indicator
         const listenEl = document.getElementById('listening');
-        listenEl.innerText = '🎙️ Listening...';
+        listenEl.innerText = '🎙️ LISTENING...';
         listenEl.style.display = 'block';
       };
       recognizer.onend = () => { document.getElementById('listening').style.display = 'none'; };
@@ -136,7 +141,7 @@
     }
 
     function handleNoResponse() {
-      document.getElementById('message').innerText = "Oh man, I think you're on speaker mode. It was hard to hear you!";
+      document.getElementById('message').innerText = "Oops, I think you're on mute!";
       setTimeout(() => updateMessage('q1'), 1500);
     }
 

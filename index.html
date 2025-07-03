@@ -7,6 +7,18 @@
     body { background-color: #000; color: #00FF00; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
     #phone-screen { position: relative; border: 2px solid #00FF00; padding: 20px; width: 300px; border-radius: 10px; box-shadow: 0 0 10px #00FF00; }
     #mute-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #00FF00; font-size: 1.2em; cursor: pointer; }
+    #listening {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 1.2em;
+      color: #FF0000;
+      display: none;
+      z-index: 10;
+      background-color: rgba(0,0,0,0.8);
+      padding: 2px 5px;
+      border-radius: 3px;
+    }
     h1 { margin-bottom: 20px; }
     button { margin: 5px; padding: 10px; font-size: 1em; background-color: #000; color: #00FF00; border: 1px solid #00FF00; border-radius: 5px; cursor: pointer; }
     button:hover { background-color: #00FF00; color: #000; }
@@ -23,6 +35,7 @@
     <h1>📞 Hacker Phone</h1>
     <button onclick="startCall()">Call</button>
     <button id="mute-btn" onclick="toggleMute()">🔊</button>
+    <div id="listening">🎙️ Listening...</div>
     <div id="message"></div>
     <div id="options"></div>
     <audio id="audio" src="placeholder.mp3" preload="auto"></audio>
@@ -43,6 +56,8 @@
       recognizer.lang = 'en-US';
       recognizer.interimResults = false;
       recognizer.maxAlternatives = 1;
+      recognizer.onstart = () => { document.getElementById('listening').style.display = 'block'; };
+      recognizer.onend = () => { document.getElementById('listening').style.display = 'none'; };
       recognizer.onresult = e => {
         clearTimeout(noResponseTimer);
         const text = e.results[0][0].transcript.trim().toLowerCase();
@@ -87,7 +102,6 @@
           recognizer.start();
           noResponseTimer = setTimeout(() => { recognizer.stop(); handleNoResponse(); }, 5000);
         } else {
-          // fallback if Speech API unsupported
           setTimeout(() => updateMessage('q1'), 1500);
         }
       }

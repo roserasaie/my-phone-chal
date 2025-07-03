@@ -36,6 +36,10 @@
     input { background:#000;color:#00FF00;border:1px solid #00FF00;padding:5px;border-radius:3px; margin:5px; }
   </style>
 </head>
+
+⩇⩇:⩇⩇
+<br><br><br>
+
 <body>
   <div id="phone-screen">
     <h1>📞 Hacker Phone</h1>
@@ -65,7 +69,7 @@
     <audio id="key0Tone" src="images/dial2.mp3" preload="auto"></audio>
   </div>
   <script>
-    const answers = { q1:'43387', q2:'Checking Votes', q3:'@freedoniavoting.com', q4:'whiskers', q5:'October', q6:'2746', q7:'Margot Warner', q8:'VOTES4EVA', q9:'Sydney' };
+    const answers = { q1:'43387', q2:'Checking Votes', q3:'@freedoniavoting.com', q4:'whiskers', q5:'October', q6:'2746', q7:'Margot Warner', q8:'VOTES4EVA' };
     let currentInput = '';
     let audio, pickupTone, optionTone, correctTone, errorTone, ringingTone, recognizer, noResponseTimer;
     const keypadTones = {};
@@ -190,12 +194,8 @@
             message = "Enter the code word we agreed on at orientation.";
             optionsHTML = `<input type="text" id="inputText8" placeholder="Type answer"/><button onclick="submitTextAnswer('q8','inputText8')">Submit</button>`;
             break;
-          case 'q9':
-            message = "What city were you hired from?";
-            optionsHTML = ['Sydney','Melbourne','Brisbane','Perth'].map(o=>`<button onclick="chooseOption('q9','${o}')">${o}</button>`).join('');
-            break;
           case 'flag':
-            message = "✅ Correct! Here is your flag: FLAG-CTF-12345";
+            message = "✅ Thanks for verifiyng! I've successfully reset your credentials. Here is your new password: FLAG-CTF-12345";
             optionsHTML = `<button onclick="updateMessage('done')">Hang up</button>`;
             break;
           case 'done':
@@ -221,7 +221,7 @@
     function chooseOption(step, choice) { if (answers[step] === choice) correctTone.play(); else errorTone.play(); checkAnswer(step, choice); }
     function checkAnswer(step, input) {
       if (input === answers[step]) {
-        const next = { q1:'q2', q2:'q3', q3:'q4', q4:'q5', q5:'q6', q6:'q7', q7:'q8', q8:'q9', q9:'flag' }[step];
+        const next = { q1:'q2', q2:'q3', q3:'q4', q4:'q5', q5:'q6', q6:'q7', q7:'q8', q8:'flag' }[step];
         updateMessage(next);
       } else {
         document.getElementById('message').innerText = 'Incorrect, try again.';

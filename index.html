@@ -18,6 +18,11 @@
       background-color: rgba(0,0,0,0.8);
       padding: 2px 5px;
       border-radius: 3px;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
     }
     h1 { margin-bottom: 20px; }
     button { margin: 5px; padding: 10px; font-size: 1em; background-color: #000; color: #00FF00; border: 1px solid #00FF00; border-radius: 5px; cursor: pointer; }
@@ -81,7 +86,8 @@
 
     function handleSpoken(text) {
       let resp;
-      if (text.includes('good')) resp = "That's great to hear! I'm doing good too.";
+      if (text.includes('hello')) resp = "Hey there!";
+      else if (text.includes('good')) resp = "That's great to hear! I'm doing good too.";
       else if (text.includes('bad') || text.includes('what')) resp = "Oh.. err.. I sure, I guess. Anyways.";
       else resp = "";
       document.getElementById('message').innerText = resp;
@@ -89,7 +95,7 @@
     }
 
     function handleNoResponse() {
-      document.getElementById('message').innerText = "I can't hear you! You might be on mute.";
+      document.getElementById('message').innerText = "Oh man, I think you're on speaker mode. It was hard to hear you!";
       setTimeout(() => updateMessage('q1'), 1500);
     }
 
@@ -109,43 +115,43 @@
         switch (step) {
           case 'q1':
             message = "What’s your employee ID?";
-            optionsHTML = `<div id="keypad"><div id="display"></div><div class="keys">${['1','2','3','4','5','6','7','8','9','0'].map(d=>`<button onclick="pressKey('${d}')">${d}</button>`).join('')}<button onclick="clearKeypad()">Clear</button><button onclick="submitKeypad('q1')">Submit</button></div></div>`;
+            optionsHTML = `<div id=\"keypad\"><div id=\"display\"></div><div class=\"keys\">${['1','2','3','4','5','6','7','8','9','0'].map(d=>`<button onclick=\"pressKey('${d}')\">${d}</button>`).join('')}<button onclick=\"clearKeypad()\">Clear</button><button onclick=\"submitKeypad('q1')\">Submit</button></div></div>`;
             break;
           case 'q2':
             message = "Which department are you in?";
-            optionsHTML = ['Finance','Checking Votes','IT','Marketing/Advertisements'].map(o=>`<button onclick="chooseOption('q2','${o}')">${o}</button>`).join('');
+            optionsHTML = ['Finance','Checking Votes','IT','Marketing/Advertisements'].map(o=>`<button onclick=\"chooseOption('q2','${o}')\">${o}</button>`).join('');
             break;
           case 'q3':
             message = "Which email needs resetting?";
-            optionsHTML = ['@freedonia.com','@freedoniavoting.com','@gmail.com','@freedonia.au'].map(o=>`<button onclick="chooseOption('q3','${o}')">${o}</button>`).join('');
+            optionsHTML = ['@freedonia.com','@freedoniavoting.com','@gmail.com','@freedonia.au'].map(o=>`<button onclick=\"chooseOption('q3','${o}')\">${o}</button>`).join('');
             break;
           case 'q4':
             message = "Spell the name of your first pet.";
-            optionsHTML = `<input type="text" id="inputText4" placeholder="Type answer"/><button onclick="checkAnswer('q4',document.getElementById('inputText4').value)">Submit</button>`;
+            optionsHTML = `<input type=\"text\" id=\"inputText4\" placeholder=\"Type answer\"/><button onclick=\"checkAnswer('q4',document.getElementById('inputText4').value)\">Submit</button>`;
             break;
           case 'q5':
             message = "What was your birth month?";
-            optionsHTML = ['March','July','January','October'].map(o=>`<button onclick="chooseOption('q5','${o}')">${o}</button>`).join('');
+            optionsHTML = ['March','July','January','October'].map(o=>`<button onclick=\"chooseOption('q5','${o}')\">${o}</button>`).join('');
             break;
           case 'q6':
             message = "What’s the last four digits of your phone number?";
-            optionsHTML = `<div id="keypad"><div id="display"></div><div class="keys">${['1','2','3','4','5','6','7','8','9','0'].map(d=>`<button onclick="pressKey('${d}')">${d}</button>`).join('')}<button onclick="clearKeypad()">Clear</button><button onclick="submitKeypad('q6')">Submit</button></div></div>`;
+            optionsHTML = `<div id=\"keypad\"><div id=\"display\"></div><div class=\"keys\">${['1','2','3','4','5','6','7','8','9','0'].map(d=>`<button onclick=\"pressKey('${d}')\">${d}</button>`).join('')}<button onclick=\"clearKeypad()\">Clear</button><button onclick=\"submitKeypad('q6')\">Submit</button></div></div>`;
             break;
           case 'q7':
             message = "Who’s your direct manager?";
-            optionsHTML = ['Lee Chen','Maya Singh','Felix Grant','Margot Warner'].map(o=>`<button onclick="chooseOption('q7','${o}')">${o}</button>`).join('');
+            optionsHTML = ['Lee Chen','Maya Singh','Felix Grant','Margot Warner'].map(o=>`<button onclick=\"chooseOption('q7','${o}')\">${o}</button>`).join('');
             break;
           case 'q8':
             message = "Enter the code word we agreed on at orientation.";
-            optionsHTML = `<input type="text" id="inputText8" placeholder="Type answer"/><button onclick="checkAnswer('q8',document.getElementById('inputText8').value)">Submit</button>`;
+            optionsHTML = `<input type=\"text\" id=\"inputText8\" placeholder=\"Type answer\"/><button onclick=\"checkAnswer('q8',document.getElementById('inputText8').value)\">Submit</button>`;
             break;
           case 'q9':
             message = "What city were you hired from?";
-            optionsHTML = ['Sydney','Melbourne','Brisbane','Perth'].map(o=>`<button onclick="chooseOption('q9','${o}')">${o}</button>`).join('');
+            optionsHTML = ['Sydney','Melbourne','Brisbane','Perth'].map(o=>`<button onclick=\"chooseOption('q9','${o}')\">${o}</button>`).join('');
             break;
           case 'flag':
             message = "✅ Correct! Here is your flag: FLAG-CTF-12345";
-            optionsHTML = `<button onclick="updateMessage('done')">Hang up</button>`;
+            optionsHTML = `<button onclick=\"updateMessage('done')\">Hang up</button>`;
             break;
           case 'done':
             message = "Goodbye!";

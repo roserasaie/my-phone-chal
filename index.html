@@ -97,7 +97,6 @@
       ringingTone.play();
       setTimeout(() => updateMessage('intro'), 2000);
     }
-
     
 
     function initRecognizer() {
@@ -108,6 +107,7 @@
       recognizer.onstart = () => {
         const listenEl = document.getElementById('listening');
         listenEl.innerText = '🎙️ LISTENING...';
+        listenEl.style.color = '#FF0000'; 
         listenEl.style.display = 'block';
       };
       recognizer.onend = () => { document.getElementById('listening').style.display = 'none'; };

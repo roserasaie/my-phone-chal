@@ -69,7 +69,7 @@
     <audio id="key0Tone" src="images/dial2.mp3" preload="auto"></audio>
   </div>
   <script>
-    const answers = { q1:'43387', q2:'Checking Votes', q3:'@freedoniavoting.com', q4:'whiskers', q5:'October', q6:'2746', q7:'Margot Warner', q8:'VOTES4EVA' };
+    const answers = { q1:'43387', q2:'Checking Votes', q3:'@freedoniavoting.com', q4:'whiskers', q5:'October', q6:'2746', q7:'Margot Warner', q8:'VOTES4EVA', :q9'Sydney' };
     let currentInput = '';
     let audio, pickupTone, optionTone, correctTone, errorTone, ringingTone, recognizer, noResponseTimer;
     const keypadTones = {};
@@ -128,11 +128,7 @@
       else if (text.includes('good')) resp = "That's great to hear! I'm doing good too.";
       else if (text.includes('bad') || text.includes('what')) resp = "Oh.. err.. I sure, I guess. Anyways.";
       document.getElementById('message').innerText = resp;
-      if (text.includes('hello') || text.includes('good')) {
-        updateMessage('q1');
-      } else {
-        setTimeout(() => updateMessage('q1'), 3000);
-      }
+
     }
 
     function handleNoResponse() {

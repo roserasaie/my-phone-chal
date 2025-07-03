@@ -21,7 +21,7 @@
 <body>
   <div id="phone-screen">
     <h1>📞 Hacker Phone</h1>
-    <button onclick="start()">Call</button>
+    <button onclick="startCall()">Call</button>
     <button id="mute-btn" onclick="toggleMute()">🔊</button>
     <div id="message"></div>
     <div id="options"></div>
@@ -30,15 +30,16 @@
   <script>
     const answers = { q1:'49382', q2:'Checking Votes', q3:'@freedoniavoting.com', q4:'whiskers', q5:'October', q6:'2746', q7:'Margot Warner', q8:'VOTES4EVA', q9:'Sydney' };
     let currentInput = '', audio, recognizer, noResponseTimer;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    function start() {
+    function startCall() {
       audio = document.getElementById('audio');
-      initRecognizer();
+      if (SpeechRecognition) initRecognizer();
       updateMessage('intro');
     }
 
     function initRecognizer() {
-      recognizer = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognizer = new SpeechRecognition();
       recognizer.lang = 'en-US';
       recognizer.interimResults = false;
       recognizer.maxAlternatives = 1;
@@ -69,12 +70,12 @@
       else if (text.includes('bad') || text.includes('what')) resp = "Oh.. err.. I sure, I guess. Anyways.";
       else resp = "";
       document.getElementById('message').innerText = resp;
-      setTimeout(()=> updateMessage('q1'), 1500);
+      setTimeout(() => updateMessage('q1'), 1500);
     }
 
     function handleNoResponse() {
       document.getElementById('message').innerText = "I can't hear you! You might be on mute.";
-      setTimeout(()=> updateMessage('q1'), 1500);
+      setTimeout(() => updateMessage('q1'), 1500);
     }
 
     function updateMessage(step) {
@@ -82,12 +83,16 @@
       let message = '', optionsHTML = '';
       if (step === 'intro') {
         message = "Hi! This is IT support. How are you?";
-        // start listening and set no-response timer
-        recognizer.start();
-        noResponseTimer = setTimeout(() => { recognizer.stop(); handleNoResponse(); }, 5000);
+        if (recognizer) {
+          recognizer.start();
+          noResponseTimer = setTimeout(() => { recognizer.stop(); handleNoResponse(); }, 5000);
+        } else {
+          // fallback if Speech API unsupported
+          setTimeout(() => updateMessage('q1'), 1500);
+        }
       }
       if (step.startsWith('q')) {
-        switch(step) {
+        switch (step) {
           case 'q1':
             message = "What’s your employee ID?";
             optionsHTML = `<div id="keypad"><div id="display"></div><div class="keys">${['1','2','3','4','5','6','7','8','9','0'].map(d=>`<button onclick="pressKey('${d}')">${d}</button>`).join('')}<button onclick="clearKeypad()">Clear</button><button onclick="submitKeypad('q1')">Submit</button></div></div>`;
@@ -143,7 +148,9 @@
     function submitKeypad(step) { checkAnswer(step, currentInput); currentInput = ''; }
     function chooseOption(step, choice) { checkAnswer(step, choice); }
     function checkAnswer(step, input) {
-      if (input === answers[step]) { const next = { q1:'q2', q2:'q3', q3:'q4', q4:'q5', q5:'q6', q6:'q7', q7:'q8', q8:'q9', q9:'flag' }[step]; updateMessage(next);
+      if (input === answers[step]) {
+        const next = { q1:'q2', q2:'q3', q3:'q4', q4:'q5', q5:'q6', q6:'q7', q7:'q8', q8:'q9', q9:'flag' }[step];
+        updateMessage(next);
       } else {
         document.getElementById('message').innerText = 'Incorrect, try again.';
       }

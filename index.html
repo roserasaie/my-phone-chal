@@ -43,39 +43,24 @@
     <div id="listening">🎙️ Listening...</div>
     <div id="message"></div>
     <div id="options"></div>
-
-    <!-- Placeholder audio elements -->
     <audio id="audio" src="placeholder.mp3" preload="auto"></audio>
-    <audio id="dialTone" src="dial-tone.mp3" preload="auto"></audio>
-    <audio id="pickupTone" src="pickup-tone.mp3" preload="auto"></audio>
-    <!-- keypad tone placeholders: keypad1.mp3 ... keypad0.mp3 -->
-    ${[1,2,3,4,5,6,7,8,9,0].map(n => `<audio id="key${n}Tone" src="keypad${n}.mp3" preload="auto"></audio>`).join('')}
-    <audio id="optionTone" src="option-tone.mp3" preload="auto"></audio>
   </div>
   <script>
     const answers = { q1:'49382', q2:'Checking Votes', q3:'@freedoniavoting.com', q4:'whiskers', q5:'October', q6:'2746', q7:'Margot Warner', q8:'VOTES4EVA', q9:'Sydney' };
-    let currentInput = '', audio, dialTone, pickupTone, optionTone, recognizer, noResponseTimer;
-    const keypadTones = {};
+    let currentInput = '', audio, recognizer, noResponseTimer;
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     function startCall() {
       audio = document.getElementById('audio');
-      dialTone = document.getElementById('dialTone');
-      pickupTone = document.getElementById('pickupTone');
-      optionTone = document.getElementById('optionTone');
-      [1,2,3,4,5,6,7,8,9,0].forEach(n => {
-        keypadTones[n] = document.getElementById(`key${n}Tone`);
-      });
       if (SpeechRecognition) initRecognizer();
-      // play dial sound
-      dialTone.currentTime = 0;
-      dialTone.play();
       updateMessage('intro');
     }
 
     function initRecognizer() {
       recognizer = new SpeechRecognition();
-      recognizer.lang = 'en-US'; recognizer.interimResults = false; recognizer.maxAlternatives = 1;
+      recognizer.lang = 'en-US';
+      recognizer.interimResults = false;
+      recognizer.maxAlternatives = 1;
       recognizer.onstart = () => { document.getElementById('listening').style.display = 'block'; };
       recognizer.onend = () => { document.getElementById('listening').style.display = 'none'; };
       recognizer.onresult = e => {
@@ -83,16 +68,20 @@
         const text = e.results[0][0].transcript.trim().toLowerCase();
         handleSpoken(text);
       };
-      recognizer.onerror = () => { clearTimeout(noResponseTimer); handleNoResponse(); };
+      recognizer.onerror = () => {
+        clearTimeout(noResponseTimer);
+        handleNoResponse();
+      };
     }
 
     function toggleMute() {
-      [audio, dialTone, pickupTone, optionTone, ...Object.values(keypadTones)].forEach(a => a.muted = !a.muted);
+      audio.muted = !audio.muted;
       document.getElementById('mute-btn').innerText = audio.muted ? '🔇' : '🔊';
     }
 
     function playAudio() {
-      audio.currentTime = 0; audio.play();
+      audio.currentTime = 0;
+      audio.play();
     }
 
     function handleSpoken(text) {
@@ -111,10 +100,6 @@
     }
 
     function updateMessage(step) {
-      // pickup sound on intro
-      if (step === 'intro') {
-        setTimeout(() => { pickupTone.currentTime = 0; pickupTone.play(); }, 500);
-      }
       playAudio();
       let message = '', optionsHTML = '';
       if (step === 'intro') {
@@ -130,43 +115,43 @@
         switch (step) {
           case 'q1':
             message = "What’s your employee ID?";
-            optionsHTML = `<div id="keypad"><div id="display"></div><div class="keys">${['1','2','3','4','5','6','7','8','9','0'].map(d=>`<button onclick="pressKey('${d}')">${d}</button>`).join('')}<button onclick="clearKeypad()">Clear</button><button onclick="submitKeypad('q1')">Submit</button></div></div>`;
+            optionsHTML = `<div id=\"keypad\"><div id=\"display\"></div><div class=\"keys\">${['1','2','3','4','5','6','7','8','9','0'].map(d=>`<button onclick=\"pressKey('${d}')\">${d}</button>`).join('')}<button onclick=\"clearKeypad()\">Clear</button><button onclick=\"submitKeypad('q1')\">Submit</button></div></div>`;
             break;
           case 'q2':
             message = "Which department are you in?";
-            optionsHTML = ['Finance','Checking Votes','IT','Marketing/Advertisements'].map(o=>`<button onclick="selectOption('q2','${o}')">${o}</button>`).join('');
+            optionsHTML = ['Finance','Checking Votes','IT','Marketing/Advertisements'].map(o=>`<button onclick=\"chooseOption('q2','${o}')\">${o}</button>`).join('');
             break;
           case 'q3':
             message = "Which email needs resetting?";
-            optionsHTML = ['@freedonia.com','@freedoniavoting.com','@gmail.com','@freedonia.au'].map(o=>`<button onclick="selectOption('q3','${o}')">${o}</button>`).join('');
+            optionsHTML = ['@freedonia.com','@freedoniavoting.com','@gmail.com','@freedonia.au'].map(o=>`<button onclick=\"chooseOption('q3','${o}')\">${o}</button>`).join('');
             break;
           case 'q4':
             message = "Spell the name of your first pet.";
-            optionsHTML = `<input type="text" id="inputText4" placeholder="Type answer"/><button onclick="submitEntry('q4',document.getElementById('inputText4').value)">Submit</button>`;
+            optionsHTML = `<input type=\"text\" id=\"inputText4\" placeholder=\"Type answer\"/><button onclick=\"checkAnswer('q4',document.getElementById('inputText4').value)\">Submit</button>`;
             break;
           case 'q5':
             message = "What was your birth month?";
-            optionsHTML = ['March','July','January','October'].map(o=>`<button onclick="selectOption('q5','${o}')">${o}</button>`).join('');
+            optionsHTML = ['March','July','January','October'].map(o=>`<button onclick=\"chooseOption('q5','${o}')\">${o}</button>`).join('');
             break;
           case 'q6':
             message = "What’s the last four digits of your phone number?";
-            optionsHTML = `<div id="keypad"><div id="display"></div><div class="keys">${['1','2','3','4','5','6','7','8','9','0'].map(d=>`<button onclick="pressKey('${d}')">${d}</button>`).join('')}<button onclick="clearKeypad()">Clear</button><button onclick="submitKeypad('q6')">Submit</button></div></div>`;
+            optionsHTML = `<div id=\"keypad\"><div id=\"display\"></div><div class=\"keys\">${['1','2','3','4','5','6','7','8','9','0'].map(d=>`<button onclick=\"pressKey('${d}')\">${d}</button>`).join('')}<button onclick=\"clearKeypad()\">Clear</button><button onclick=\"submitKeypad('q6')\">Submit</button></div></div>`;
             break;
           case 'q7':
             message = "Who’s your direct manager?";
-            optionsHTML = ['Lee Chen','Maya Singh','Felix Grant','Margot Warner'].map(o=>`<button onclick="selectOption('q7','${o}')">${o}</button>`).join('');
+            optionsHTML = ['Lee Chen','Maya Singh','Felix Grant','Margot Warner'].map(o=>`<button onclick=\"chooseOption('q7','${o}')\">${o}</button>`).join('');
             break;
           case 'q8':
             message = "Enter the code word we agreed on at orientation.";
-            optionsHTML = `<input type="text" id="inputText8" placeholder="Type answer"/><button onclick="submitEntry('q8',document.getElementById('inputText8').value)">Submit</button>`;
+            optionsHTML = `<input type=\"text\" id=\"inputText8\" placeholder=\"Type answer\"/><button onclick=\"checkAnswer('q8',document.getElementById('inputText8').value)\">Submit</button>`;
             break;
           case 'q9':
             message = "What city were you hired from?";
-            optionsHTML = ['Sydney','Melbourne','Brisbane','Perth'].map(o=>`<button onclick="selectOption('q9','${o}')">${o}</button>`).join('');
+            optionsHTML = ['Sydney','Melbourne','Brisbane','Perth'].map(o=>`<button onclick=\"chooseOption('q9','${o}')\">${o}</button>`).join('');
             break;
           case 'flag':
             message = "✅ Correct! Here is your flag: FLAG-CTF-12345";
-            optionsHTML = `<button onclick="updateMessage('done')">Hang up</button>`;
+            optionsHTML = `<button onclick=\"updateMessage('done')\">Hang up</button>`;
             break;
           case 'done':
             message = "Goodbye!";
@@ -178,17 +163,10 @@
       document.getElementById('options').innerHTML = optionsHTML;
     }
 
-    function pressKey(d) {
-      currentInput += d;
-      document.getElementById('display').innerText = currentInput;
-      keypadTones[d].currentTime = 0;
-      keypadTones[d].play();
-    }
+    function pressKey(d) { currentInput += d; document.getElementById('display').innerText = currentInput; }
     function clearKeypad() { currentInput = ''; document.getElementById('display').innerText = ''; }
-    function submitKeypad(step) { optionTone.currentTime = 0; optionTone.play(); checkAnswer(step, currentInput); currentInput = ''; }
-    function selectOption(step, choice) { optionTone.currentTime = 0; optionTone.play(); checkAnswer(step, choice); }
-    function submitEntry(step, entry) { optionTone.currentTime = 0; optionTone.play(); checkAnswer(step, entry); }
-
+    function submitKeypad(step) { checkAnswer(step, currentInput); currentInput = ''; }
+    function chooseOption(step, choice) { checkAnswer(step, choice); }
     function checkAnswer(step, input) {
       if (input === answers[step]) {
         const next = { q1:'q2', q2:'q3', q3:'q4', q4:'q5', q5:'q6', q6:'q7', q7:'q8', q8:'q9', q9:'flag' }[step];

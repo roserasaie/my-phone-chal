@@ -5,7 +5,8 @@
   <title>Hacker Phone Call 📞</title>
   <style>
     body { background-color: #000; color: #00FF00; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-    #phone-screen { border: 2px solid #00FF00; padding: 20px; width: 300px; border-radius: 10px; box-shadow: 0 0 10px #00FF00; }
+    #phone-screen { position: relative; border: 2px solid #00FF00; padding: 20px; width: 300px; border-radius: 10px; box-shadow: 0 0 10px #00FF00; }
+    #mute-btn { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #00FF00; font-size: 1.2em; cursor: pointer; }
     h1 { margin-bottom: 20px; }
     button { margin: 5px; padding: 10px; font-size: 1em; background-color: #000; color: #00FF00; border: 1px solid #00FF00; border-radius: 5px; cursor: pointer; }
     button:hover { background-color: #00FF00; color: #000; }
@@ -21,105 +22,68 @@
   <div id="phone-screen">
     <h1>📞 Hacker Phone</h1>
     <button onclick="start()">Call</button>
+    <button id="mute-btn" onclick="toggleMute()">🔊</button>
     <div id="message"></div>
     <div id="options"></div>
+    <audio id="audio" src="placeholder.mp3" preload="auto"></audio>
   </div>
   <script>
-    const answers = {
-      q1: '49382',
-      q2: 'Checking Votes',
-      q3: '@freedoniavoting.com',
-      q4: 'whiskers',
-      q5: 'October',
-      q6: '2746',
-      q7: 'Margot Warner',
-      q8: 'VOTES4EVA',
-      q9: 'Sydney'
-    };
-    let currentInput = '';
-    function start() { updateMessage('q1'); }
+    const answers = { q1:'49382', q2:'Checking Votes', q3:'@freedoniavoting.com', q4:'whiskers', q5:'October', q6:'2746', q7:'Margot Warner', q8:'VOTES4EVA', q9:'Sydney' };
+    let currentInput = '', audio;
+    function start() { audio = document.getElementById('audio'); updateMessage('q1'); }
+    function toggleMute() { audio.muted = !audio.muted; document.getElementById('mute-btn').innerText = audio.muted ? '🔇' : '🔊'; }
+    function playAudio() { audio.currentTime = 0; audio.play(); }
     function pressKey(d) { currentInput += d; document.getElementById('display').innerText = currentInput; }
     function clearKeypad() { currentInput = ''; document.getElementById('display').innerText = ''; }
-    function submitKeypad(step) {
-      checkAnswer(step, currentInput);
-      currentInput = '';
-    }
+    function submitKeypad(step) { checkAnswer(step, currentInput); currentInput = ''; }
     function chooseOption(step, choice) { checkAnswer(step, choice); }
     function checkAnswer(step, input) {
-      const correct = answers[step];
-      if (input === correct) {
-        const next = ({ q1:'q2', q2:'q3', q3:'q4', q4:'q5', q5:'q6', q6:'q7', q7:'q8', q8:'q9', q9:'flag' })[step];
+      if (input === answers[step]) {
+        const next = { q1:'q2', q2:'q3', q3:'q4', q4:'q5', q5:'q6', q6:'q7', q7:'q8', q8:'q9', q9:'flag' }[step];
         updateMessage(next);
       } else {
         document.getElementById('message').innerText = 'Incorrect, try again.';
       }
     }
     function updateMessage(step) {
+      playAudio();
       let message = '', optionsHTML = '';
       switch(step) {
         case 'q1':
           message = "What’s your employee ID?";
-          optionsHTML = `
-            <div id="keypad">
-              <div id="display"></div>
-              <div class="keys">
-                ${['1','2','3','4','5','6','7','8','9','0'].map(d=>`<button onclick="pressKey('${d}')">${d}</button>`).join('')}
-                <button onclick="clearKeypad()">Clear</button>
-                <button onclick="submitKeypad('q1')">Submit</button>
-              </div>
-            </div>`;
+          optionsHTML = `<div id="keypad"><div id="display"></div><div class="keys">${['1','2','3','4','5','6','7','8','9','0'].map(d=>`<button onclick="pressKey('${d}')">${d}</button>`).join('')}<button onclick="clearKeypad()">Clear</button><button onclick="submitKeypad('q1')">Submit</button></div></div>`;
           break;
         case 'q2':
           message = "Which department are you in?";
-          ['Finance','Checking Votes','IT','Marketing/Advertisements'].forEach(opt=>{})
-          optionsHTML = ['Finance','Checking Votes','IT','Marketing/Advertisements']
-            .map(o=>`<button onclick="chooseOption('q2','${o}')">${o}</button>`).join('');
+          optionsHTML = ['Finance','Checking Votes','IT','Marketing/Advertisements'].map(o=>`<button onclick="chooseOption('q2','${o}')">${o}</button>`).join('');
           break;
         case 'q3':
           message = "Which email needs resetting?";
-          optionsHTML = ['@freedonia.com','@freedoniavoting.com','@gmail.com','@freedonia.au']
-            .map(o=>`<button onclick="chooseOption('q3','${o}')">${o}</button>`).join('');
+          optionsHTML = ['@freedonia.com','@freedoniavoting.com','@gmail.com','@freedonia.au'].map(o=>`<button onclick="chooseOption('q3','${o}')">${o}</button>`).join('');
           break;
         case 'q4':
           message = "Spell the name of your first pet.";
-          optionsHTML = `
-            <input type="text" id="inputText4" placeholder="Type answer"/>
-            <button onclick="checkAnswer('q4',document.getElementById('inputText4').value)">Submit</button>
-          `;
+          optionsHTML = `<input type="text" id="inputText4" placeholder="Type answer"/><button onclick="checkAnswer('q4',document.getElementById('inputText4').value)">Submit</button>`;
           break;
         case 'q5':
           message = "What was your birth month?";
-          optionsHTML = ['March','July','January','October']
-            .map(o=>`<button onclick="chooseOption('q5','${o}')">${o}</button>`).join('');
+          optionsHTML = ['March','July','January','October'].map(o=>`<button onclick="chooseOption('q5','${o}')">${o}</button>`).join('');
           break;
         case 'q6':
           message = "What’s the last four digits of your phone number?";
-          optionsHTML = `
-            <div id="keypad">
-              <div id="display"></div>
-              <div class="keys">
-                ${['1','2','3','4','5','6','7','8','9','0'].map(d=>`<button onclick="pressKey('${d}')">${d}</button>`).join('')}
-                <button onclick="clearKeypad()">Clear</button>
-                <button onclick="submitKeypad('q6')">Submit</button>
-              </div>
-            </div>`;
+          optionsHTML = `<div id="keypad"><div id="display"></div><div class="keys">${['1','2','3','4','5','6','7','8','9','0'].map(d=>`<button onclick="pressKey('${d}')">${d}</button>`).join('')}<button onclick="clearKeypad()">Clear</button><button onclick="submitKeypad('q6')">Submit</button></div></div>`;
           break;
         case 'q7':
           message = "Who’s your direct manager?";
-          optionsHTML = ['Lee Chen','Maya Singh','Felix Grant','Margot Warner']
-            .map(o=>`<button onclick="chooseOption('q7','${o}')">${o}</button>`).join('');
+          optionsHTML = ['Lee Chen','Maya Singh','Felix Grant','Margot Warner'].map(o=>`<button onclick="chooseOption('q7','${o}')">${o}</button>`).join('');
           break;
         case 'q8':
           message = "Enter the code word we agreed on at orientation.";
-          optionsHTML = `
-            <input type="text" id="inputText8" placeholder="Type answer"/>
-            <button onclick="checkAnswer('q8',document.getElementById('inputText8').value)">Submit</button>
-          `;
+          optionsHTML = `<input type="text" id="inputText8" placeholder="Type answer"/><button onclick="checkAnswer('q8',document.getElementById('inputText8').value)">Submit</button>`;
           break;
         case 'q9':
           message = "What city were you hired from?";
-          optionsHTML = ['Sydney','Melbourne','Brisbane','Perth']
-            .map(o=>`<button onclick="chooseOption('q9','${o}')">${o}</button>`).join('');
+          optionsHTML = ['Sydney','Melbourne','Brisbane','Perth'].map(o=>`<button onclick="chooseOption('q9','${o}')">${o}</button>`).join('');
           break;
         case 'flag':
           message = "✅ Correct! Here is your flag: FLAG-CTF-12345";

@@ -43,24 +43,57 @@
     <div id="listening">🎙️ Listening...</div>
     <div id="message"></div>
     <div id="options"></div>
+
+    <!-- Audio elements -->
+    <audio id="ringingTone" src="images/ringing.mp3" preload="auto"></audio>
     <audio id="audio" src="placeholder.mp3" preload="auto"></audio>
+    <audio id="pickupTone" src="images/pickup-tone.mp3" preload="auto"></audio>
+    <audio id="optionTone" src="images/option-tone.mp3" preload="auto"></audio>
+    <audio id="correctTone" src="images/correct.mp3" preload="auto"></audio>
+    <audio id="errorTone" src="images/error.mp3" preload="auto"></audio>
+    <!-- keypad tones -->
+    <audio id="key1Tone" src="images/dial1.mp3" preload="auto"></audio>
+    <audio id="key2Tone" src="images/dial2.mp3" preload="auto"></audio>
+    <audio id="key3Tone" src="images/dial3.mp3" preload="auto"></audio>
+    <audio id="key4Tone" src="images/dial1.mp3" preload="auto"></audio>
+    <audio id="key5Tone" src="images/dial2.mp3" preload="auto"></audio>
+    <audio id="key6Tone" src="images/dial3.mp3" preload="auto"></audio>
+    <audio id="key7Tone" src="images/dial1.mp3" preload="auto"></audio>
+    <audio id="key8Tone" src="images/dial2.mp3" preload="auto"></audio>
+    <audio id="key9Tone" src="images/dial3.mp3" preload="auto"></audio>
+    <audio id="key0Tone" src="images/dial2.mp3" preload="auto"></audio>
   </div>
   <script>
     const answers = { q1:'49382', q2:'Checking Votes', q3:'@freedoniavoting.com', q4:'whiskers', q5:'October', q6:'2746', q7:'Margot Warner', q8:'VOTES4EVA', q9:'Sydney' };
-    let currentInput = '', audio, recognizer, noResponseTimer;
+    let currentInput = '', audio, pickupTone, optionTone, correctTone, errorTone, ringingTone, recognizer, noResponseTimer;
+    const keypadTones = {};
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     function startCall() {
+      const listenEl = document.getElementById('listening');
+      // show ringing status
+      listenEl.innerText = 'ringing...';
+      listenEl.style.display = 'block';
+      ringingTone = document.getElementById('ringingTone');
       audio = document.getElementById('audio');
+      pickupTone = document.getElementById('pickupTone');
+      optionTone = document.getElementById('optionTone');
+      correctTone = document.getElementById('correctTone');
+      errorTone = document.getElementById('errorTone');
+      [1,2,3,4,5,6,7,8,9,0].forEach(n => {
+        keypadTones[n] = document.getElementById(`key${n}Tone`);
+      });
       if (SpeechRecognition) initRecognizer();
-      updateMessage('intro');
+      // play ringing sound
+      ringingTone.currentTime = 0;
+      ringingTone.play();
+      // delay before intro prompt
+      setTimeout(() => updateMessage('intro'), 2000);
     }
 
     function initRecognizer() {
       recognizer = new SpeechRecognition();
-      recognizer.lang = 'en-US';
-      recognizer.interimResults = false;
-      recognizer.maxAlternatives = 1;
+      recognizer.lang = 'en-US'; recognizer.interimResults = false; recognizer.maxAlternatives = 1;
       recognizer.onstart = () => { document.getElementById('listening').style.display = 'block'; };
       recognizer.onend = () => { document.getElementById('listening').style.display = 'none'; };
       recognizer.onresult = e => {
@@ -68,20 +101,16 @@
         const text = e.results[0][0].transcript.trim().toLowerCase();
         handleSpoken(text);
       };
-      recognizer.onerror = () => {
-        clearTimeout(noResponseTimer);
-        handleNoResponse();
-      };
+      recognizer.onerror = () => { clearTimeout(noResponseTimer); handleNoResponse(); };
     }
 
     function toggleMute() {
-      audio.muted = !audio.muted;
-      document.getElementById('mute-btn').innerText = audio.muted ? '🔇' : '🔊';
+      [ringingTone, audio, pickupTone, optionTone, correctTone, errorTone, ...Object.values(keypadTones)].forEach(a => a.muted = !a.muted);
+      document.getElementById('mute-btn').innerText = ringingTone.muted ? '🔇' : '🔊';
     }
 
     function playAudio() {
-      audio.currentTime = 0;
-      audio.play();
+      audio.currentTime = 0; audio.play();
     }
 
     function handleSpoken(text) {
@@ -100,6 +129,12 @@
     }
 
     function updateMessage(step) {
+      if (step === 'intro') {
+        // hide ringing status before showing intro and start mic
+        const listenEl = document.getElementById('listening');
+        listenEl.style.display = 'none';
+        setTimeout(() => { pickupTone.currentTime = 0; pickupTone.play(); }, 500);
+      }
       playAudio();
       let message = '', optionsHTML = '';
       if (step === 'intro') {
@@ -163,10 +198,10 @@
       document.getElementById('options').innerHTML = optionsHTML;
     }
 
-    function pressKey(d) { currentInput += d; document.getElementById('display').innerText = currentInput; }
+    function pressKey(d) { currentInput += d; document.getElementById('display').innerText = currentInput; keypadTones[d].play(); }
     function clearKeypad() { currentInput = ''; document.getElementById('display').innerText = ''; }
-    function submitKeypad(step) { checkAnswer(step, currentInput); currentInput = ''; }
-    function chooseOption(step, choice) { checkAnswer(step, choice); }
+    function submitKeypad(step) { if (answers[step] === currentInput) correctTone.play(); else errorTone.play(); checkAnswer(step, currentInput); currentInput = ''; }
+    function chooseOption(step, choice) { if (answers[step] === choice) correctTone.play(); else errorTone.play(); checkAnswer(step, choice); }
     function checkAnswer(step, input) {
       if (input === answers[step]) {
         const next = { q1:'q2', q2:'q3', q3:'q4', q4:'q5', q5:'q6', q6:'q7', q7:'q8', q8:'q9', q9:'flag' }[step];

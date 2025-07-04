@@ -72,12 +72,15 @@
     <audio id="key0Tone" src="images/dial2.mp3" preload="auto"></audio>
   </div>
   <script>
-    const answers = { q1:'43387', q2:'Checking Votes', q3:'@freedoniavoting.com', q4:'whiskers', q5:'October', q6:'2746', q7:'Margot Warner', q8:'VOTES4EVA', q9:'Sydney' };
+    const answers = { q1:'43387', q2:'Checking Votes', q3:'@freedoniavoting.com', q4:'whiskers', q5:'October', q6:'2746', q7:'Margot Warner', q8:'VOTES4EVA' };
     let currentInput = '';
     let audio, pickupTone, optionTone, correctTone, errorTone, ringingTone, recognizer, noResponseTimer;
     const keypadTones = {};
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
+
+
+    
     function startCall() {
       const listenEl = document.getElementById('listening');
 
@@ -107,7 +110,7 @@
 
     function initRecognizer() {
       recognizer = new SpeechRecognition();
-      recognizer.lang = 'en-US';
+      recognizer.lang = 'en-AU';
       recognizer.interimResults = false;
       recognizer.maxAlternatives = 1;
       recognizer.onstart = () => {

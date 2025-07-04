@@ -20,6 +20,9 @@
       border-radius: 3px;
       animation: blink 2s infinite;
     }
+    #listening.ringing   { color: #00FF00; }  /* green */
+    #listening.listening { color: #FF0000; }  /* red   */
+
     @keyframes blink {
       0%, 100% { opacity: 1; }
       50% { opacity: 0; }
@@ -77,9 +80,12 @@
 
     function startCall() {
       const listenEl = document.getElementById('listening');
-      listenEl.innerText = 'ringing...';
-      listenEl.style.color = '#00FF00'; 
+
+      listenEl.innerText = 'ringing…';
+      listenEl.classList.add('ringing');
+      listenEl.classList.remove('listening');
       listenEl.style.display = 'block';
+
       const callBtn = document.getElementById('call-btn');
       callBtn.disabled = true;
       callBtn.classList.add('disabled');
@@ -107,7 +113,8 @@
       recognizer.onstart = () => {
         const listenEl = document.getElementById('listening');
         listenEl.innerText = '🎙️ LISTENING...';
-        listenEl.style.color = '#FF0000'; 
+        listenEl.classList.add('listening');
+        listenEl.classList.remove('ringing');
         listenEl.style.display = 'block';
       };
       recognizer.onend = () => { document.getElementById('listening').style.display = 'none'; };
